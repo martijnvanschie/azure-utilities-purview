@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Reduct.Azure.Services.Purview.Scanning;
+using Microsoft.Extensions.Logging;
 
 namespace Azure.Purview.Cli.Commands.Scanning
 {
@@ -21,6 +22,9 @@ namespace Azure.Purview.Cli.Commands.Scanning
 
     internal class DeleteDataSourceCommand : Command
     {
+        ILogger<DeleteDataSourceCommand> _commandLogger = LoggingManager.LoggerFactoryInstance.CreateLogger<DeleteDataSourceCommand>();
+        ILogger<DataSourceClient> _dsClientLogger = LoggingManager.LoggerFactoryInstance.CreateLogger<DataSourceClient>();
+
         public DeleteDataSourceCommand(string? description = null) : base("delete", description)
         {
             AddOptions();
@@ -42,7 +46,7 @@ namespace Azure.Purview.Cli.Commands.Scanning
             {
                 AnsiConsole.MarkupLine($"Deleteing data source [cyan1]{dataSourceName}[/] from account [cyan1]{accountName}[/].");
 
-                DataSourceClient _client = new DataSourceClient(null);
+                DataSourceClient _client = new DataSourceClient(null, _dsClientLogger);
                 await _client.DeleteDataSourceAsync(accountName, dataSourceName);
 
             }, accountName, dataSourceName);
