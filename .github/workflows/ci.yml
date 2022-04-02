@@ -36,7 +36,7 @@ jobs:
     - name: Publish
       if: ${{ github.event_name != 'pull_request' }}
       run: |
-        cd EventGrid.Publisher.ConsoleApp
+        cd Azure.Purview.Cli
         dotnet publish -p:PublishSingleFile=$SINGLE_FILE --runtime win-x64 --configuration Release --no-self-contained --output ../../publish/
     - name: Upload a Build Artifact
       if: ${{ github.event_name != 'pull_request' }}
