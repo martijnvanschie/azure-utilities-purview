@@ -54,7 +54,7 @@ jobs:
 
     env:
       SINGLE_FILE: "true"
-      PROJECT_FILE: "cli/EventGrid.Publisher.ConsoleApp/EventGrid.Publisher.ConsoleApp.csproj"
+      PROJECT_FILE: "cli/Azure.Purview.Cli/Azure.Purview.Cli.csproj"
 
     defaults:
       run:
