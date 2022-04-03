@@ -1,29 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AssemblyName>apv</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>apv</AssemblyName>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<AssemblyVersion>0.1.0</AssemblyVersion>
+		<FileVersion>0.1.0.1</FileVersion>
+		<InformationalVersion>0.1.1-beta.1+204ff0a</InformationalVersion>
+		<PackageVersion>0.1.1-beta.1</PackageVersion>
+		<PublishSingleFile>false</PublishSingleFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Spectre.Console" Version="0.44.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+		<PackageReference Include="Spectre.Console" Version="0.44.0" />
+		<PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Reduct.Azure.Services.Purview\Reduct.Azure.Services.Purview.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Reduct.Azure.Services.Purview\Reduct.Azure.Services.Purview.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
