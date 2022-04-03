@@ -73,14 +73,6 @@ jobs:
         run: |
           dotnet restore
 
-      - name: This is where we apply the versions to the csproj file
-        run: |
-          echo version-assembly = ${{ needs.create_release_version.outputs.version-assembly }} 
-          echo version-file = ${{ needs.create_release_version.outputs.version-file }}
-          echo version-informational = ${{ needs.create_release_version.outputs.version-informational }}
-          echo version-package = ${{ needs.create_release_version.outputs.version-package }}
-          echo buildnumber = ${{ needs.create_release_version.outputs.buildnumber }} 
-
       - name: xml-replace-action AssemblyVersion
         uses: rvolo/xml-replace-action@v0.3
         with:
