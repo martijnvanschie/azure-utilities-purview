@@ -1,0 +1,170 @@
+name: Create release based on tag
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  create_release_version:
+    name: Extract tag and create release
+    runs-on: ubuntu-latest
+
+    outputs:
+      version-assembly: ${{ steps.output-params.outputs.version-assembly }}
+      version-file: ${{ steps.output-params.outputs.version-file }}
+      version-informational: ${{ steps.output-params.outputs.version-informational }}
+      version-package: ${{ steps.output-params.outputs.version-package }}
+      buildnumber: ${{ steps.output-params.outputs.buildnumber }}
+
+    env:
+      VERBOSE: 'true'
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+
+      - name: Query for latest tag
+        id: querytag
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          #exclude: '*-rc*'
+          commit-ish: 'HEAD'
+
+      - name: Get version from tag
+        id: dotnet-versions
+        uses: martijnvanschie/github-actions/get-dotnet-versions@v1.0.0-rc.1
+        with: 
+          version: ${{ steps.querytag.outputs.tag }}
+
+      - name: Set output parameters
+        id: output-params
+        shell: bash
+        run: |
+          echo "::set-output name=version-assembly::${{ steps.dotnet-versions.outputs.version-assembly }}"
+          echo "::set-output name=version-file::${{ steps.dotnet-versions.outputs.version-file }}"
+          echo "::set-output name=version-informational::${{ steps.dotnet-versions.outputs.version-informational }}"
+          echo "::set-output name=version-package::${{ steps.dotnet-versions.outputs.version-package }}"
+          echo "::set-output name=buildnumber::${{ steps.dotnet-versions.outputs.buildnumber }}"            
+
+  build_artifacts:
+    name: Build and publish artifacts
+    needs: create_release_version
+    runs-on: windows-latest
+
+    env:
+      SINGLE_FILE: "true"
+      PROJECT_FILE: "cli/EventGrid.Publisher.ConsoleApp/EventGrid.Publisher.ConsoleApp.csproj"
+
+    defaults:
+      run:
+        working-directory: ./cli
+    
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore
+
+      - name: This is where we apply the versions to the csproj file
+        run: |
+          echo version-assembly = ${{ needs.create_release_version.outputs.version-assembly }} 
+          echo version-file = ${{ needs.create_release_version.outputs.version-file }}
+          echo version-informational = ${{ needs.create_release_version.outputs.version-informational }}
+          echo version-package = ${{ needs.create_release_version.outputs.version-package }}
+          echo buildnumber = ${{ needs.create_release_version.outputs.buildnumber }} 
+
+      - name: xml-replace-action AssemblyVersion
+        uses: rvolo/xml-replace-action@v0.3
+        with:
+          filepath: '${{ env.PROJECT_FILE }}'
+          xpath: '//Project/PropertyGroup/AssemblyVersion/text()'
+          replace: '${{ needs.create_release_version.outputs.version-assembly }}' 
+
+      - name: xml-replace-action FileVersion
+        uses: rvolo/xml-replace-action@v0.3
+        with:
+          filepath: '${{ env.PROJECT_FILE }}'
+          xpath: '//Project/PropertyGroup/FileVersion/text()'
+          replace: '${{ needs.create_release_version.outputs.version-file }}' 
+
+      - name: xml-replace-action InformationalVersion
+        uses: rvolo/xml-replace-action@v0.3
+        with:
+          filepath: '${{ env.PROJECT_FILE }}'
+          xpath: '//Project/PropertyGroup/InformationalVersion/text()'
+          replace: '${{ needs.create_release_version.outputs.version-informational }}' 
+
+      - name: xml-replace-action PackageVersion
+        uses: rvolo/xml-replace-action@v0.3
+        with:
+          filepath: '${{ env.PROJECT_FILE }}'
+          xpath: '//Project/PropertyGroup/PackageVersion/text()'
+          replace: '${{ needs.create_release_version.outputs.version-package }}'  
+
+      - name: Print project file
+        run: cat '${{ env.PROJECT_FILE }}'
+
+      - name: Build
+        run: |
+          dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: | 
+          dotnet test --no-build --verbosity normal
+
+      # PublishSingleFile
+      - name: Set PublishSingleFile to true
+        uses: rvolo/xml-replace-action@v0.3
+        with:
+          filepath: '${{ env.PROJECT_FILE }}'
+          xpath: '//Project/PropertyGroup/PublishSingleFile/text()'
+          replace: 'true'       
+
+      - name: Publish
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          cd Azure.Purview.Cli
+          dotnet publish --runtime win-x64 --configuration Release --no-self-contained --output ../../publish/
+
+      - name: Upload a Build Artifact
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: cli
+          path: publish/
+
+  release-cli:
+    name: Release the cli
+    runs-on: ubuntu-latest
+    needs: [create_release_version, build_artifacts]
+    
+    steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: cli
+
+    - name: Zip Release
+      uses: TheDoctor0/zip-release@0.6.1
+      with:
+        filename: evgtpub-release-win-x64-${{ needs.create_release_version.outputs.version-package }}.zip
+
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "evgtpub-release-win-x64-${{ needs.create_release_version.outputs.version-package }}.zip"
+        name: Release v${{ needs.create_release_version.outputs.version-package }}
+        body: |
+          # Release notes
+          
+          v${{ needs.create_release_version.outputs.version-package }} of Event Grid Utilities
+        tag: v${{ needs.create_release_version.outputs.version-package }}
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
