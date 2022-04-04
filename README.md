@@ -20,6 +20,32 @@ Example command that deletes a data source from your purview account
 
 `apv datasource delete --account-name "my-purview-account" --datasource-name "my-datasource-name"`
 
+### Diagnostics
+
+The cli supports a diagnostics command, `apv diagnostics`, that can help in debugging authentication problems.
+
+Run the following command to test the authentication and print out the token when successful.
+
+`apv diagnostics token`
+
+Run the following command to print out simple token claims to check basic information
+
+`apv diagnostics credentials`
+
+This will print out a table with the following claim information.
+
+```bash
+            Token Claims
++-----------------+-----------------+
+| Key             | Value           |
+|-----------------+-----------------|
+| idtyp           | app             |
+| app_displayname | some-name       |
+| unique_name     | XXXXXX          |
+| upn             | XXXXXX          |
++-----------------+-----------------+
+```
+
 ### Authentication
 
 Under the hood the tool uses a `TokenCredential` created by the `DefaultAzureCredential`. This means that you have some control over the way the cli will authenticate against your account.
