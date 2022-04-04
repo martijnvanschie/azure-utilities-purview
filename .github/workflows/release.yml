@@ -71,6 +71,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
+          dotnet nuget add source --username martijnvanschie --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/martijnvanschie/index.json"
           dotnet restore
 
       - name: xml-replace-action AssemblyVersion
