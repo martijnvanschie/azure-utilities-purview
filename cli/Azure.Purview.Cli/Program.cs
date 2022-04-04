@@ -2,14 +2,18 @@
 using Azure.Purview.Cli;
 using System.CommandLine;
 using Spectre.Console;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
-//Debugger.Launch();
+Console.OutputEncoding = Encoding.UTF8;
+Console.InputEncoding = Encoding.UTF8;
+
 LoggingManager.SetupLogging();
 var logger = LoggingManager.LoggerFactoryInstance.CreateLogger<Program>();
 
 VersionInfo.PrintVerionInfo();
+
+
 Console.WriteLine();
 
 var rootCommand = new CommandLineParser();

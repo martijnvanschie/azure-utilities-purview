@@ -12,6 +12,7 @@
 		<InformationalVersion>0.1.1-beta.1+204ff0a</InformationalVersion>
 		<PackageVersion>0.1.1-beta.1</PackageVersion>
 		<PublishSingleFile>false</PublishSingleFile>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,6 +21,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
 		<PackageReference Include="Spectre.Console" Version="0.44.0" />
 		<PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.16.0" />
 	</ItemGroup>
 
 	<ItemGroup>

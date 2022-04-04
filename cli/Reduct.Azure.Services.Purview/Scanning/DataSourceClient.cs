@@ -1,6 +1,5 @@
 using Azure.Analytics.Purview.Scanning;
 using Azure.Core;
-using Azure.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -10,20 +9,19 @@ namespace Reduct.Azure.Services.Purview.Scanning
     {
         private readonly ILogger<DataSourceClient> _logger;
 
-        private TokenCredential _tokenCredential;
+        private static TokenCredential _tokenCredential;
 
-        public DataSourceClient(TokenCredential? credential, ILogger<DataSourceClient> logger = null)
+        public DataSourceClient(TokenCredential credential, ILogger<DataSourceClient>? logger = null)
         {
             _logger = logger ?? NullLogger<DataSourceClient>.Instance;
 
             if (credential == null)
             {
-                _tokenCredential = CredentialsManager.GetCredentials();
+                _logger.LogWarning($"No credential was passed to the constructor.");
+                throw new ArgumentNullException(nameof(credential));
             }
-            else
-            {
-                _tokenCredential = credential;
-            }
+
+            _tokenCredential = credential;
         }
 
         public async Task DeleteDataSourceAsync(string accountName, string dataSourceName)
