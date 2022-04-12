@@ -154,7 +154,7 @@ jobs:
 
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "evgtpub-release-win-x64-${{ needs.create_release_version.outputs.version-package }}.zip"
+        artifacts: "apv-win-x64-${{ needs.create_release_version.outputs.version-package }}.zip"
         name: Release v${{ needs.create_release_version.outputs.version-package }}
         body: |
           # Release notes
