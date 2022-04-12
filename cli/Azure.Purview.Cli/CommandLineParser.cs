@@ -1,4 +1,5 @@
 ﻿using Azure.Purview.Cli.Commands;
+using Azure.Purview.Cli.Commands.Account;
 using Azure.Purview.Cli.Commands.Scanning;
 using Spectre.Console;
 using System;
@@ -25,13 +26,14 @@ namespace Azure.Purview.Cli
             AddDefaultOptions();
 
             Command.AddCommand(new DataSourcesRootCommand());
+            Command.AddCommand(new CollectionsRootCommand());
             Command.AddCommand(new DiagnosticsCommand());
         }
 
         internal void AddDefaultOptions()
         {
             _debug.SetDefaultValue(false);
-            Command.AddArgument(_debug);
+            //Command.AddArgument(_debug);
 
 
             //var accountName = new Option<bool>("--debug", "Attaches the debugger to the cli process.");

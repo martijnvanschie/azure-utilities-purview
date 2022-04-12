@@ -1,10 +1,26 @@
 # Azure Purview Utilities
 
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/martijnvanschie/azure-utilities-purview?label=Latest%20Release&logo=github) ![GitHub Release Date](https://img.shields.io/github/release-date/martijnvanschie/azure-utilities-purview?logo=github) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/martijnvanschie/azure-utilities-purview/Continues%20Integration?label=CI%20build&logo=github)
+
 ## Purpose
 
 This is a small cli tool that let's you your Azure Purview using Command-Line interface.
 
+## Getting started
+
+### Download
+
+To get started, download the [latest](https://github.com/martijnvanschie/azure-utilities-purview/releases/latest) release from the release page. Alternatively you can choose any of the pre-release versions available or just fork the code and build it yourself.
+
+Currently the following downloads are available
+
+| Artifact                                        | Description      	|
+|-------------------------------------------------|------------------	|
+| apv-win-x64-{version}.zip                	  | A windows x64 based version which requires .NET Runtime to be installed 	|
+
 ## Prerequisites
+
+Depending on the artifact you download you need to have [.NET 6.0 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime) installed on your machine.
 
 The Azure Purview cli expects a Purview account to be deployed for it to work. The information of the account is then used as options for the cli to manage objects in the account.
 
