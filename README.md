@@ -30,6 +30,65 @@ Run the following command from the command line to get the cli usage information
 
 `apv -h`
 
+## Working with Collections
+
+### Listing all collection in a Purview account
+
+To get a tree view of all the collection in the Purview account use the following command
+
+`apc collection list -an <accountname>`
+
+You can use the following options:
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| --account-name | -an | Specifiy the name of the Purview account |
+| --include-name | -n  | Specifiy if the result also outputs the collection name in addition to the friendly name |
+
+Example commands:
+
+`apv collection list -an <accountname>`
+
+`apv collection list -an <accountname> -n true`
+
+The last command will output the following information. The value between the `[]` is the collection name.
+
+```bash
+rootname
+├── Collection One [collection-one]
+│   ├── Sub Collection One [sub-collection-one]
+│   └── Sub Collection Two [sub-collection-two]
+```
+
+## Working with Data Sources
+
+### Listing all data sources in a Purview account
+
+To get a tree view of all the data source in the Purview account use the following command
+
+`apc datasource list -an accountname`
+
+You can use the following options:
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| --account-name | -an | Specifiy the name of the Purview account |
+| --filter | -f  | A filter to apply to the data source names to list |
+
+Example commands:
+
+`apv datasource list -an <accountname>`
+
+`apv datasource list -an <accountname> --filter "somefilter"`
+
+The last command will output the following information. The last value behind the data source is the data source kind.
+
+```bash
+...
+└── collection name
+    └── Data-Source-Name - AzureResourceGroup
+```
+
 ### Delete a data source from a purview account
 
 Example command that deletes a data source from your purview account
