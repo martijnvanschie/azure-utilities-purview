@@ -1,7 +1,9 @@
+using Azure;
 using Azure.Analytics.Purview.Scanning;
 using Azure.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Reduct.Azure.Services.Purview.Model;
 
 namespace Reduct.Azure.Services.Purview.Scanning
 {
@@ -14,7 +16,8 @@ namespace Reduct.Azure.Services.Purview.Scanning
         private readonly ILogger<DataSourceClient> _logger;
 
         private static TokenCredential _tokenCredential;
-        private static Uri _uri;
+        private static Uri _uriAccount;
+        private static Uri _uriScan;
 
         public DataSourceClient(string accountName, TokenCredential credential, ILogger<DataSourceClient>? logger = null)
         {
@@ -27,13 +30,50 @@ namespace Reduct.Azure.Services.Purview.Scanning
             }
 
             _tokenCredential = credential;
-            _uri = new Uri($"https://{accountName}.purview.azure.com/account");
-            _logger.LogDebug($"Setting Purview endpoint uri to [{_uri}].");
+            _uriAccount = new Uri($"https://{accountName}.purview.azure.com/account");
+            _uriAccount = new Uri($"https://{accountName}.scan.purview.azure.com");
+            _logger.LogDebug($"Setting Purview endpoint uri to [{_uriAccount}].");
+        }
+
+        public async Task<DataSourceList> ListAllDataSourceAsync()
+        {
+            _logger.LogDebug($"Setting Purview endpoint uri to [{_uriAccount}].");
+            var dsClient = new PurviewScanningServiceClient(_uriAccount, _tokenCredential);
+
+            try
+            {
+                _logger.LogDebug("Calling Purview Scan Data Plane - Data Sources - List All");
+
+                var options = new RequestOptions(perCall =>
+                {
+                    _logger.LogDebug($"Calling paged Purview API [{perCall.Request.Uri}]");
+                });
+
+                var response2 = dsClient.GetDataSourcesAsync(options);
+
+                var dsList = new DataSourceList();
+                dsList.DataSources = new List<DataSource>();
+                dsList.Count = 0;
+
+                await foreach (var secretProperties in response2)
+                {
+                    var ds = secretProperties.ToObjectFromJson<DataSource>();
+                    dsList.DataSources.Add(ds);
+                    dsList.Count++;
+                }
+
+                return dsList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while sending request to Purview API. [{ex.Message}]");
+                throw;
+            }
         }
 
         public async Task DeleteDataSourceAsync(string dataSourceName)
         {
-            var dsClient = new PurviewDataSourceClient(_uri, dataSourceName, _tokenCredential);
+            var dsClient = new PurviewDataSourceClient(_uriAccount, dataSourceName, _tokenCredential);
 
             try
             {
