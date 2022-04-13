@@ -2,6 +2,7 @@
 using System.CommandLine;
 using Reduct.Azure.Services.Purview.Scanning;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Azure.Purview.Cli.Commands.Scanning
 {
