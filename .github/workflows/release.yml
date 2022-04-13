@@ -51,6 +51,21 @@ jobs:
     name: Build and publish artifacts
     needs: create_release_version
     runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - runtime: "win-x64"
+            selfContained: "--no-self-contained"
+            publishFolder: "win-x64"
+          - runtime: "win-x64"
+            selfContained: "--self-contained"
+            publishFolder: "win-x64-self-contained"
+          - runtime: "linux-x64"
+            selfContained: "--no-self-contained"
+            publishFolder: "linux-x64"
+          - runtime: "linux-x64"
+            selfContained: "--self-contained"
+            publishFolder: "linux-x64-self-contained"            
 
     env:
       SINGLE_FILE: "true"
@@ -127,14 +142,19 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           cd Azure.Purview.Cli
-          dotnet publish --runtime win-x64 --configuration Release --no-self-contained --output ../../publish/
+          dotnet publish --runtime ${{ matrix.runtime }} --configuration Release ${{ matrix.selfContained }} --output ../../publish/${{ matrix.publishFolder }}
+      - name: Zip Release
+        uses: TheDoctor0/zip-release@0.6.1
+        with:
+          path: publish/${{ matrix.publishFolder }}
+          filename: apv-${{ matrix.publishFolder }}-${{ needs.create_release_version.outputs.version-package }}.zip 
 
       - name: Upload a Build Artifact
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v3.0.0
         with:
           name: cli
-          path: publish/
+          path: "*.zip"
 
   release-cli:
     name: Release the cli
@@ -147,14 +167,9 @@ jobs:
       with:
         name: cli
 
-    - name: Zip Release
-      uses: TheDoctor0/zip-release@0.6.1
-      with:
-        filename: apv-win-x64-${{ needs.create_release_version.outputs.version-package }}.zip
-
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "apv-win-x64-${{ needs.create_release_version.outputs.version-package }}.zip"
+        artifacts: "*.zip"
         name: Release v${{ needs.create_release_version.outputs.version-package }}
         body: |
           # Release notes
